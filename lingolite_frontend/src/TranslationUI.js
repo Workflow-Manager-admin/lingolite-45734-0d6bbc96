@@ -21,15 +21,47 @@ function TranslationUI() {
   const [sourceLang, setSourceLang] = useState('auto');
   const [targetLang, setTargetLang] = useState('en');
   
-  // Dummy translate function (will be replaced with real API later)
+  // Translate function - calls LibreTranslate API for real translation
   // PUBLIC_INTERFACE
-  const handleTranslate = () => {
-    // For demo: reverse the input, append [translated], and show target language
-    if (input.trim()) {
-      const reversed = input.trim().split('').reverse().join('');
-      setOutput(`[${targetLang.toUpperCase()}] ${reversed} [translated]`);
-    } else {
+  const handleTranslate = async () => {
+    if (!input.trim()) {
       setOutput('');
+      return;
+    }
+    setOutput('Translating...');
+    try {
+      // LibreTranslate public endpoint (no API key needed)
+      const res = await fetch("https://libretranslate.de/translate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          q: input,
+          source: sourceLang === 'auto' ? "auto" : sourceLang,
+          target: targetLang,
+          format: "text"
+        })
+      });
+      if (!res.ok) {
+        throw new Error(`API error (${res.status}): ${res.statusText}`);
+      }
+      const data = await res.json();
+      if (typeof data?.translatedText === "string") {
+        setOutput(data.translatedText);
+      } else if (data?.error) {
+        setOutput(`API error: ${data.error}`);
+      } else {
+        setOutput("Unexpected response from translation API.");
+      }
+    } catch (err) {
+      setOutput(
+        "Translation failed. " +
+        (err.message.includes('API key') ?
+          "Please supply an API key if needed and check API status." :
+          err.message
+        )
+      );
     }
   };
   
