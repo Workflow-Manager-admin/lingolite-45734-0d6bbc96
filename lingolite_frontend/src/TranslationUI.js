@@ -21,7 +21,7 @@ function TranslationUI() {
   const [sourceLang, setSourceLang] = useState('auto');
   const [targetLang, setTargetLang] = useState('en');
   
-  // Translate function - calls LibreTranslate API for real translation
+  // Translate function - calls MyMemory Translation API for translation
   // PUBLIC_INTERFACE
   const handleTranslate = async () => {
     if (!input.trim()) {
@@ -30,40 +30,59 @@ function TranslationUI() {
     }
     setOutput('Translating...');
     try {
-      // LibreTranslate public endpoint (no API key needed)
-      const res = await fetch("https://libretranslate.de/translate", {
-        // Note: tested CORS-friendly endpoint. 
-        // If CORS or network fails here, try using another endpoint below.
-        // const res = await fetch("https://libretranslate.com/translate", {...});
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          q: input,
-          source: sourceLang === 'auto' ? "auto" : sourceLang,
-          target: targetLang,
-          format: "text"
-        })
-      });
+      // MyMemory API expects langpair as e.g. "en|es"
+      // If auto-detect is chosen, MyMemory allows "auto|target"
+      const langpair =
+        (sourceLang === 'auto' ? 'auto' : sourceLang) + '|' + targetLang;
+
+      // API params
+      let url =
+        'https://api.mymemory.translated.net/get' +
+        '?q=' + encodeURIComponent(input) +
+        '&langpair=' + encodeURIComponent(langpair);
+
+      // Optionally, add &de=<email> for identification if desired
+
+      const res = await fetch(url);
+
       if (!res.ok) {
         throw new Error(`API error (${res.status}): ${res.statusText}`);
       }
+
       const data = await res.json();
-      if (typeof data?.translatedText === "string") {
-        setOutput(data.translatedText);
-      } else if (data?.error) {
-        setOutput(`API error: ${data.error}`);
+
+      // MyMemory returns data.responseData.translatedText for translation
+      if (
+        data &&
+        data.responseData &&
+        typeof data.responseData.translatedText === 'string'
+      ) {
+        const result = data.responseData.translatedText.trim();
+        // MyMemory sometimes returns same as input if language pair is invalid
+        if (result.length === 0) {
+          setOutput("No translation received.");
+        } else if (
+          result === input &&
+          sourceLang !== targetLang &&
+          sourceLang !== 'auto'
+        ) {
+          setOutput(
+            "Translation unavailable for selected pair or already in target language."
+          );
+        } else {
+          setOutput(result);
+        }
+      } else if (data && data.responseDetails) {
+        setOutput(
+          "API error: " + data.responseDetails
+        );
       } else {
         setOutput("Unexpected response from translation API.");
       }
     } catch (err) {
       setOutput(
         "Translation failed. " +
-        (err.message.includes('API key') ?
-          "Please supply an API key if needed and check API status." :
-          err.message
-        )
+        (err.message || "An unknown error occurred.")
       );
     }
   };
