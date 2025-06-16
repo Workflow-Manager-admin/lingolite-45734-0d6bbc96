@@ -34,3 +34,13 @@ Entrypoint main 1.4 MiB = bundle.js 1.4 MiB main.12d0727f0f266922a436.hot-update
 cached modules 1.27 MiB [cached] 43 modules
 runtime modules 27.5 KiB 14 modules
 webpack 5.99.9 compiled successfully in 93 ms
+assets by status 569 bytes [cached] 1 asset
+assets by path *.js 1.41 MiB
+  asset bundle.js 1.4 MiB [emitted] (name: main)
+  asset main.846dea017d26d1b9c0da.hot-update.js 10.9 KiB [emitted] [immutable] [hmr] (name: main)
+asset main.846dea017d26d1b9c0da.hot-update.json 28 bytes [emitted] [immutable] [hmr]
+Entrypoint main 1.41 MiB = bundle.js 1.4 MiB main.846dea017d26d1b9c0da.hot-update.js 10.9 KiB
+cached modules 1.26 MiB [cached] 42 modules
+runtime modules 27.5 KiB 14 modules
+./src/TranslationUI.js 7.64 KiB [built] [code generated]
+webpack 5.99.9 compiled successfully in 104 ms

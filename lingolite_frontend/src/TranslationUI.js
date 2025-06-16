@@ -21,11 +21,16 @@ function TranslationUI() {
   const [sourceLang, setSourceLang] = useState('auto');
   const [targetLang, setTargetLang] = useState('en');
   
-  // Dummy translate function (replace with real API later)
+  // Dummy translate function (will be replaced with real API later)
   // PUBLIC_INTERFACE
   const handleTranslate = () => {
-    // For demo just echo text uppercased (simulate translation)
-    setOutput(input.trim() ? `[${targetLang.toUpperCase()}] ${input}` : '');
+    // For demo: reverse the input, append [translated], and show target language
+    if (input.trim()) {
+      const reversed = input.trim().split('').reverse().join('');
+      setOutput(`[${targetLang.toUpperCase()}] ${reversed} [translated]`);
+    } else {
+      setOutput('');
+    }
   };
   
   // PUBLIC_INTERFACE
