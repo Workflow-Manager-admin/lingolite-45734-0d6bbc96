@@ -32,6 +32,9 @@ function TranslationUI() {
     try {
       // LibreTranslate public endpoint (no API key needed)
       const res = await fetch("https://libretranslate.de/translate", {
+        // Note: tested CORS-friendly endpoint. 
+        // If CORS or network fails here, try using another endpoint below.
+        // const res = await fetch("https://libretranslate.com/translate", {...});
         method: "POST",
         headers: {
           "Content-Type": "application/json"
